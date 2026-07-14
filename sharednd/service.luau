@@ -7,15 +7,28 @@
 -- `niri msg -j casts`, which is the authoritative state, so no per-event
 -- bookkeeping is needed and reconnects re-sync for free (the stream sends
 -- the full current state, including CastsChanged, on connect).
+--
+-- Stop transitions are debounced by STOP_DEBOUNCE seconds. Switching what is
+-- being shared surfaces as a stop/start event pair; acting on the stop
+-- immediately would race the follow-up status query (the async `off` can
+-- land after the query already read DND as on), dropping ownership and
+-- leaving DND off for the rest of the new sharing session. The debounce
+-- collapses the pair into no transition, and also keeps DND from flapping.
+
+local STOP_DEBOUNCE = 1.0
 
 local function cfg(key)
   return noctalia.getConfig(key)
 end
 
--- true while at least one screencast is believed to be running
+-- debounced sharing state that the DND logic acts on
 local sharingActive = false
 -- true when this plugin enabled DND (and therefore owns turning it off)
 local dndSetByUs = false
+
+-- raw state from the last casts query + pending debounced stop deadline
+local rawActive = false
+local stopDeadline = nil -- os.clock() timestamp, nil when no stop is pending
 
 local queryInFlight = false
 local queryDirty = false
@@ -87,15 +100,17 @@ local function onSharingStopped()
 end
 
 local function applyState(activeCount)
-  local active = activeCount > 0
-  if active == sharingActive then
-    return
-  end
-  sharingActive = active
-  if active then
-    onSharingStarted()
-  else
-    onSharingStopped()
+  rawActive = activeCount > 0
+  if rawActive then
+    -- A restart within the debounce window cancels the pending stop, so a
+    -- stop/start pair from switching casts is no transition at all.
+    stopDeadline = nil
+    if not sharingActive then
+      sharingActive = true
+      onSharingStarted()
+    end
+  elseif sharingActive and stopDeadline == nil then
+    stopDeadline = os.clock() + STOP_DEBOUNCE
   end
 end
 
@@ -126,21 +141,48 @@ local function onEventLine(line)
   end
 end
 
--- Boot. The niri check is a user-facing warning only; the stream loop below
--- retries forever anyway, which also covers niri's socket coming up after
--- noctalia during session start.
-noctalia.runAsync("niri msg version", function(res)
-  if res == nil or res.exitCode ~= 0 then
-    noctalia.notifyError(noctalia.tr("notify.no_niri_title"), noctalia.tr("notify.no_niri_body"))
-    noctalia.log("sharednd: niri IPC not reachable at startup")
+-- Host-driven tick (~250 ms): commits a pending stop once the debounce
+-- window has passed without sharing resuming.
+function update()
+  if stopDeadline ~= nil and os.clock() >= stopDeadline then
+    stopDeadline = nil
+    if sharingActive and not rawActive then
+      sharingActive = false
+      onSharingStopped()
+    end
   end
-end)
-
--- The process group is killed on plugin disable, taking the shell loop and
--- the stream down with it.
-if not noctalia.runStream("while :; do niri msg -j event-stream 2>/dev/null; sleep 3; done", onEventLine) then
-  noctalia.log("sharednd: failed to start niri event-stream")
 end
 
--- Safety net in case the initial CastsChanged is ever missed.
-queryCasts()
+-- Called by the host on plugin disable/reload. The callback-less runAsync
+-- spawns a detached process, so it survives the VM teardown.
+function onExit()
+  if dndSetByUs then
+    noctalia.runAsync("noctalia msg notification-dnd-set off")
+  end
+end
+
+-- Boot. `niri msg` needs the niri binary and NIRI_SOCKET (set only inside a
+-- niri session), so gate detection on both instead of spawning a retry loop
+-- that can never succeed on other compositors.
+local niriSocket = noctalia.getenv("NIRI_SOCKET")
+if niriSocket == nil or niriSocket == "" then
+  -- Expected on other compositors: stay silent and spawn nothing.
+  noctalia.log("sharednd: no NIRI_SOCKET, not a niri session — detection disabled")
+elseif not noctalia.commandExists("niri") then
+  -- Inside a niri session but the binary is unreachable — worth a warning.
+  noctalia.notifyError(noctalia.tr("notify.no_niri_title"), noctalia.tr("notify.no_niri_body"))
+  noctalia.log("sharednd: NIRI_SOCKET set but niri not in PATH — detection disabled")
+else
+  -- The process group is killed on plugin disable, taking the shell loop and
+  -- the stream down with it. That cleanup does not run when the host dies
+  -- hard (crash, session logout), so the loop also exits on its own once the
+  -- parent is gone or the niri socket disappears — otherwise orphaned loops
+  -- would keep respawning `niri msg` every 3 s across sessions.
+  local loop = 'P=$PPID; while kill -0 "$P" 2>/dev/null && [ -S "$NIRI_SOCKET" ]; do'
+    .. " niri msg -j event-stream 2>/dev/null; sleep 3; done"
+  if not noctalia.runStream(loop, onEventLine) then
+    noctalia.log("sharednd: failed to start niri event-stream")
+  end
+  -- Safety net in case the initial CastsChanged is ever missed.
+  queryCasts()
+end

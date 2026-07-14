@@ -13,6 +13,9 @@ enabled. When the last screencast stops, notifications come back.
 - On every cast event it re-queries `niri msg -j casts` as the authoritative
   state, so missed or reordered events cannot desync it. The stream is wrapped
   in a shell retry loop and resends full state on reconnect.
+- Stop transitions are debounced by ~1 second: switching what is being shared
+  produces a stop/start event pair, which the debounce collapses — DND does
+  not flap, and the stop/start race cannot drop ownership.
 - DND is toggled through the host IPC (`noctalia msg notification-dnd-set`),
   so the usual OSD feedback appears.
 
@@ -35,7 +38,8 @@ enabled. When the last screencast stops, notifications come back.
 
 ## Requirements & limitations
 
-- Requires **niri** (detection is niri IPC; on other compositors the plugin
-  is inert and shows a warning at startup).
-- There is no plugin-disable hook in the host: if you disable the plugin
-  mid-share while it owns DND, DND stays on — toggle it manually.
+- Requires **niri** (detection is niri IPC). Detection only starts inside a
+  niri session (`NIRI_SOCKET` set and the `niri` binary in `PATH`); on other
+  compositors the service is inert and spawns no processes.
+- Disabling or reloading the plugin mid-share while it owns DND turns DND
+  back off (`onExit` cleanup).
