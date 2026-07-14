@@ -2,10 +2,12 @@ id              = "avivbintangaringga/nix-monitor"
 name            = "Nix Monitor"
 version         = "1.0.0"
 min_noctalia    = "5.0.0"
+icon            = "package"
 author          = "avivbintangaringga"
 description     = "Nixpkgs update monitor"
 tags            = [ "nix", "utility" ]
 dependencies    = [ "nixos-version", "git", "pkill" ]
+license         = "MIT"
 
 [[widget]]
 id      = "Nix Monitor"
