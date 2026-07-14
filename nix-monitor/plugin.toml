@@ -113,21 +113,21 @@ type            = "select"
 label_key       = "setting.branch.label"
 description_key = "setting.branch.description"
 options         = [
-    { value = "master", label = "Master" },
-    { value = "nixos-unstable", label = "NixOS Unstable" },
-    { value = "nixos-unstable-small", label = "NixOS Unstable Small" },
-    { value = "nixos-25.11", label = "NixOS 25.11" },
-    { value = "nixos-25.05", label = "NixOS 25.05" },
-    { value = "nixos-24.11", label = "NixOS 24.11" },
-    { value = "nixos-24.05", label = "NixOS 24.05" },
-    { value = "nixos-23.11", label = "NixOS 23.11" },
-    { value = "nixos-23.05", label = "NixOS 23.05" },
-    { value = "nixos-25.11-small", label = "NixOS 25.11 Small" },
-    { value = "nixos-25.05-small", label = "NixOS 25.05 Small" },
-    { value = "nixos-24.11-small", label = "NixOS 24.11 Small" },
-    { value = "nixos-24.05-small", label = "NixOS 24.05 Small" },
-    { value = "nixos-23.11-small", label = "NixOS 23.11 Small" },
-    { value = "nixos-23.05-small", label = "NixOS 23.05 Small" },
+    { value = "master", label_key = "setting.option.branch.master" },
+    { value = "nixos-unstable", label_key = "setting.option.branch.nixos_unstable" },
+    { value = "nixos-unstable-small", label_key = "setting.option.branch.nixos_unstable_small" },
+    { value = "nixos-25.11", label_key = "setting.option.branch.nixos_25_11" },
+    { value = "nixos-25.05", label_key = "setting.option.branch.nixos_25_05" },
+    { value = "nixos-24.11", label_key = "setting.option.branch.nixos_24_11" },
+    { value = "nixos-24.05", label_key = "setting.option.branch.nixos_24_05" },
+    { value = "nixos-23.11", label_key = "setting.option.branch.nixos_23_11" },
+    { value = "nixos-23.05", label_key = "setting.option.branch.nixos_23_05" },
+    { value = "nixos-25.11-small", label_key = "setting.option.branch.nixos_25_11_small" },
+    { value = "nixos-25.05-small", label_key = "setting.option.branch.nixos_25_05_small" },
+    { value = "nixos-24.11-small", label_key = "setting.option.branch.nixos_24_11_small" },
+    { value = "nixos-24.05-small", label_key = "setting.option.branch.nixos_24_05_small" },
+    { value = "nixos-23.11-small", label_key = "setting.option.branch.nixos_23_11_small" },
+    { value = "nixos-23.05-small", label_key = "setting.option.branch.nixos_23_05_small" },
 ]
 default         = "nixos-unstable"
 

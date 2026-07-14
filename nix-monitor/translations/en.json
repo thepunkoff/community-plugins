@@ -42,5 +42,20 @@
   "setting.clean_command.label": "Clean command",
   "setting.clean_command.description": "Command to run when clicking Clean button",
   "setting.close_on_enter.label": "Close on press Enter",
-  "setting.close_on_enter.description": "Add 'Press enter to exit' on the terminal window"
+  "setting.close_on_enter.description": "Add 'Press enter to exit' on the terminal window",
+  "setting.option.branch.master": "Master",
+  "setting.option.branch.nixos_unstable": "NixOS Unstable",
+  "setting.option.branch.nixos_unstable_small": "NixOS Unstable Small",
+  "setting.option.branch.nixos_25_11": "NixOS 25.11",
+  "setting.option.branch.nixos_25_05": "NixOS 25.05",
+  "setting.option.branch.nixos_24_11": "NixOS 24.11",
+  "setting.option.branch.nixos_24_05": "NixOS 24.05",
+  "setting.option.branch.nixos_23_11": "NixOS 23.11",
+  "setting.option.branch.nixos_23_05": "NixOS 23.05",
+  "setting.option.branch.nixos_25_11_small": "NixOS 25.11 Small",
+  "setting.option.branch.nixos_25_05_small": "NixOS 25.05 Small",
+  "setting.option.branch.nixos_24_11_small": "NixOS 24.11 Small",
+  "setting.option.branch.nixos_24_05_small": "NixOS 24.05 Small",
+  "setting.option.branch.nixos_23_11_small": "NixOS 23.11 Small",
+  "setting.option.branch.nixos_23_05_small": "NixOS 23.05 Small"
 }
