@@ -24,8 +24,15 @@ RESERVED_NAMES = {"license", "readme", "index", "api", "admin", "static", "asset
 # the thumbnail as its card, and the English catalog backs every label_key.
 REQUIRED_PLUGIN_FILES = ("README.md", "thumbnail.webp", "translations/en.json")
 THUMBNAIL_MAX_BYTES = 512 * 1024
+# The store and the website lay out plugin cards on a fixed 16:9 grid, so the thumbnail
+# generator exports exactly this.
+THUMBNAIL_SIZE = (960, 540)
+THUMBNAIL_GENERATOR_URL = "https://assets.noctalia.dev/plugins/thumbnail-generator.html"
 WEBP_MAGIC_PREFIX = b"RIFF"
 WEBP_MAGIC_FORMAT = b"WEBP"
+# Enough of the file to cover the RIFF header plus the first chunk header and the widest
+# dimension field of any WebP variant.
+WEBP_HEADER_BYTES = 32
 
 ROOT_STRING_FIELDS = (
     "id",
@@ -104,6 +111,47 @@ def rel(root: Path, path: Path) -> str:
         return path.relative_to(root).as_posix()
     except ValueError:
         return path.as_posix()
+
+
+def webp_dimensions(header: bytes) -> tuple[int, int] | None:
+    """Width and height from a WebP header, or None if it is not one we can read.
+
+    The three container variants each store the size differently, and the generator's
+    output is only one of them, so all three are handled.
+    """
+    if len(header) < 16 or header[:4] != WEBP_MAGIC_PREFIX or header[8:12] != WEBP_MAGIC_FORMAT:
+        return None
+
+    fourcc = header[12:16]
+    payload = header[20:]
+
+    if fourcc == b"VP8X":
+        # Extended: 4 bytes of flags, then canvas width and height as 24-bit values,
+        # each stored as size minus one.
+        if len(payload) < 10:
+            return None
+        width = int.from_bytes(payload[4:7], "little") + 1
+        height = int.from_bytes(payload[7:10], "little") + 1
+        return width, height
+
+    if fourcc == b"VP8 ":
+        # Lossy: a 3-byte frame tag, the start code, then two 14-bit dimensions.
+        if len(payload) < 10 or payload[3:6] != b"\x9d\x01\x2a":
+            return None
+        width = int.from_bytes(payload[6:8], "little") & 0x3FFF
+        height = int.from_bytes(payload[8:10], "little") & 0x3FFF
+        return width, height
+
+    if fourcc == b"VP8L":
+        # Lossless: a signature byte, then both dimensions minus one packed into 28 bits.
+        if len(payload) < 5 or payload[0] != 0x2F:
+            return None
+        bits = int.from_bytes(payload[1:5], "little")
+        width = (bits & 0x3FFF) + 1
+        height = ((bits >> 14) & 0x3FFF) + 1
+        return width, height
+
+    return None
 
 
 def has_key_path(data: Any, dotted_key: str) -> bool:
@@ -679,9 +727,27 @@ class Validator:
             )
 
         with thumbnail.open("rb") as handle:
-            header = handle.read(12)
+            header = handle.read(WEBP_HEADER_BYTES)
         if header[:4] != WEBP_MAGIC_PREFIX or header[8:12] != WEBP_MAGIC_FORMAT:
             self.add_error(manifest_path, "thumbnail.webp is not a WebP image")
+            return
+
+        dimensions = webp_dimensions(header)
+        expected = f"{THUMBNAIL_SIZE[0]}x{THUMBNAIL_SIZE[1]}"
+        if dimensions is None:
+            self.add_error(
+                manifest_path,
+                f"thumbnail.webp dimensions could not be read; export a {expected} WebP "
+                f"with {THUMBNAIL_GENERATOR_URL}",
+            )
+            return
+
+        if dimensions != THUMBNAIL_SIZE:
+            self.add_error(
+                manifest_path,
+                f"thumbnail.webp is {dimensions[0]}x{dimensions[1]}; it must be {expected}. "
+                f"Export one with {THUMBNAIL_GENERATOR_URL}",
+            )
 
     def validate_no_symlinks(self, manifest_path: Path, plugin_dir: Path) -> None:
         for path in plugin_dir.rglob("*"):
