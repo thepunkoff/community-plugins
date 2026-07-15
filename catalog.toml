@@ -16,3 +16,14 @@ description = "A bar widget that displays Swatch Internet (.beat) Time"
 deprecated = false
 min_noctalia = "5.0.0"
 tags = ["fun", "clock", "utility", "time"]
+
+[[plugin]]
+id = "whyoolw/sharednd"
+name = "ShareDND"
+version = "1.1.0"
+author = "whyoolw"
+license = "MIT"
+icon = "screen-share"
+description = "Enables notification Do Not Disturb while the screen is shared (niri screencast) and turns notifications back on when sharing stops. Requires niri."
+min_noctalia = "5.0.0"
+tags = ["privacy", "niri"]
