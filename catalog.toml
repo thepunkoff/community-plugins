@@ -38,3 +38,15 @@ icon = "photo"
 description = "Fetches a new daily wallpaper from Bing or NASA."
 min_noctalia = "5.0.0"
 tags = ["wallpaper", "desktop"]
+
+[[plugin]]
+id = "joshuaslate/shelly"
+name = "Shelly"
+version = "1.0.0"
+author = "joshuaslate"
+license = "MIT"
+icon = "package"
+description = "A plugin that provides a widget for displaying system update information."
+deprecated = false
+min_noctalia = "5.0.0"
+tags = ["system", "arch"]
