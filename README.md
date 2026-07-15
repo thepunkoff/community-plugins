@@ -107,6 +107,19 @@ your plugin, set the title, category tag and accent color, then export the 960×
 Write `translations/en.json` only. Every `label_key` and `description_key` in your manifest must resolve to a key in
 it, and CI checks this. Do not add machine-translated locales; other languages are handled separately.
 
+### Tags
+
+The `tags` in `plugin.toml` are used for catalog search. Tags must be lowercase and selected from this list:
+
+- Surfaces: `bar`, `desktop`, `launcher`, `panel`, `service`, `shortcut`
+- Purpose: `ai`, `animation`, `audio`, `clock`, `countdown`, `demo`, `development`, `emoticon`, `fun`, `gaming`,
+  `hardware`, `indicator`, `language`, `media`, `music`, `network`, `privacy`, `productivity`, `recording`, `system`,
+  `theming`, `time`, `utility`, `video`, `wallpaper`
+- Compositors: `hyprland`, `labwc`, `mangowc`, `niri`, `sway`
+
+If your plugin does not fit any existing tag, propose a new one in your pull request rather than inventing a tag in
+the manifest.
+
 ## Submitting
 
 Open a PR against `main`. CI validates your manifest, entry scripts, required files, and thumbnail on every push.
