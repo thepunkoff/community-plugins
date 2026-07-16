@@ -1,4 +1,4 @@
-noctalia.setUpdateInterval(5000)
+noctalia.setUpdateInterval(1000)
 
 -- Helper functions
 function tr(key)
@@ -267,7 +267,7 @@ function update()
     end
 
     -- Generations check
-    if (os.time() - getState("lastGenerationsCheckTime")) >= 20 then
+    if (os.time() - getState("lastGenerationsCheckTime")) >= 10 then
         checkGenerations()
     end
 

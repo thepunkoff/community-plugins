@@ -212,6 +212,8 @@ watchState("isRemoteCheckRunning", render)
 watchState("lastRemoteCheckTimeStr", render)
 watchState("localHash", render)
 watchState("remoteHash", render)
+watchState("storeSize", render)
+watchState("closureSize", render)
 
 -- Hooks
 function onOpen(_ctx)
