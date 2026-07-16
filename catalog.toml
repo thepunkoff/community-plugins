@@ -111,7 +111,7 @@ tags = ["gaming", "launcher"]
 [[plugin]]
 id = "avivbintangaringga/nix-monitor"
 name = "Nix Monitor"
-version = "1.1.0"
+version = "1.1.1"
 author = "avivbintangaringga"
 license = "MIT"
 icon = "package"
