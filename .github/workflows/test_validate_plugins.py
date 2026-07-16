@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -101,6 +102,101 @@ class PluginConfigAccessorTests(unittest.TestCase):
             ]
         )
         self.assertEqual(validate_plugins.obsolete_config_accessors(source), [])
+
+
+class ReadmeTests(unittest.TestCase):
+    MANIFEST = {
+        "id": "me/example",
+        "dependencies": ["example-cli"],
+        "setting": [{"key": "interval"}],
+        "widget": [{"id": "widget", "entry": "widget.luau"}],
+        "panel": [{"id": "panel", "entry": "panel.luau"}],
+        "launcher_provider": [
+            {"id": "search", "entry": "launcher.luau", "prefix": "ex"}
+        ],
+    }
+
+    VALID_README = """# Example
+
+Example provides a useful widget, panel, and launcher for demonstration purposes.
+
+## Plugin
+
+| Field | Value |
+| --- | --- |
+| ID | `me/example` |
+| Entries | Widget: `widget`; panel: `panel`; launcher: `search` |
+| Launcher Prefix | `/ex` |
+
+## Requirements
+
+Install `example-cli` on `PATH`.
+
+## Usage
+
+Add the widget, type `/ex`, or open the panel:
+
+```sh
+noctalia msg panel-toggle me/example:panel
+```
+
+## Settings
+
+Configure the update interval in plugin settings.
+"""
+
+    def validate_readme(self, contents: str) -> list[str]:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            plugin_dir = root / "example"
+            plugin_dir.mkdir()
+            (plugin_dir / "README.md").write_text(contents, encoding="utf-8")
+            validator = validate_plugins.Validator(root)
+            validator.validate_readme(plugin_dir, self.MANIFEST)
+            return validator.errors
+
+    def test_accepts_official_plugin_readme_structure(self) -> None:
+        self.assertEqual(self.validate_readme(self.VALID_README), [])
+
+    def test_requires_core_sections_and_intro(self) -> None:
+        errors = self.validate_readme("# Example\n\nToo short.\n")
+        self.assertTrue(any("short introduction" in error for error in errors))
+        self.assertTrue(any("## Plugin" in error for error in errors))
+        self.assertTrue(any("## Usage" in error for error in errors))
+
+    def test_headings_inside_code_fences_do_not_satisfy_sections(self) -> None:
+        errors = self.validate_readme(
+            "# Example\n\nA sufficiently descriptive introduction for this example plugin.\n\n"
+            "```md\n## Plugin\n## Usage\n```\n"
+        )
+        self.assertTrue(any("## Plugin" in error for error in errors))
+        self.assertTrue(any("## Usage" in error for error in errors))
+
+    def test_derives_documented_values_from_manifest(self) -> None:
+        readme = self.VALID_README
+        replacements = {
+            "`me/example`": "`me/wrong`",
+            "`widget`": "`other-widget`",
+            "noctalia msg panel-toggle me/example:panel": "noctalia msg panel-toggle me/example:wrong",
+            "`/ex`": "`/wrong`",
+            "`example-cli`": "`other-cli`",
+        }
+        for old, new in replacements.items():
+            with self.subTest(missing=old):
+                errors = self.validate_readme(readme.replace(old, new))
+                self.assertTrue(errors)
+
+    def test_requires_conditional_sections(self) -> None:
+        without_requirements = self.VALID_README.replace(
+            "## Requirements\n\nInstall `example-cli` on `PATH`.\n\n", ""
+        )
+        without_settings = self.VALID_README.replace(
+            "## Settings\n\nConfigure the update interval in plugin settings.\n", ""
+        )
+        self.assertTrue(
+            any("## Requirements" in error for error in self.validate_readme(without_requirements))
+        )
+        self.assertTrue(any("## Settings" in error for error in self.validate_readme(without_settings)))
 
 
 if __name__ == "__main__":

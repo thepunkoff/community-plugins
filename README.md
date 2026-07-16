@@ -102,6 +102,25 @@ the **[thumbnail generator](https://assets.noctalia.dev/plugins/thumbnail-genera
 your plugin, set the title, category tag and accent color, then export the 960×540 WebP and commit it as
 `<plugin>/thumbnail.webp`.
 
+### README
+
+`README.md` is the plugin's public page, so it must tell a user how to access every entry instead of only describing
+the implementation. Follow [`README_TEMPLATE.md`](README_TEMPLATE.md), which mirrors the structure used by the
+official plugins:
+
+- Start with a title, a short explanation, a `Plugin` table, and practical `Usage` instructions.
+- Copy the plugin id and every entry id exactly from `plugin.toml`.
+- If the plugin declares a panel, include the exact command
+  `noctalia msg panel-toggle <author>/<plugin>:<panel-id>`.
+- If it declares a launcher provider, document its `/<prefix>` and give an example query.
+- Mention every manifest dependency under `Requirements`, using the exact dependency name.
+- Document declared settings, including units or non-obvious effects.
+- Use `IPC` and `Notes` when the plugin exposes extra events or has important filesystem, network, process, privacy,
+  hardware, or compositor behavior.
+
+CI derives ids, panel commands, launcher prefixes, dependencies, and whether settings exist from `plugin.toml`. Its
+error messages show the exact missing value, while maintainers review the usefulness and accuracy of the prose.
+
 ### Translations
 
 Write `translations/en.json` only. Every `label_key` and `description_key` in your manifest must resolve to a key in

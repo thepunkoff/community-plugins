@@ -6,6 +6,20 @@ When the first screencast starts (any app sharing via the portal — Discord,
 OBS, browsers, `niri msg action set-dynamic-cast-*`, ...), notification DND is
 enabled. When the last screencast stops, notifications come back.
 
+## Plugin
+
+| Field | Value |
+| --- | --- |
+| ID | `whyoolw/sharednd` |
+| Entry | Service: `service` |
+
+## Usage
+
+Enable the plugin in Settings → Plugins while running a niri session. The
+headless service starts monitoring screencasts immediately; it has no bar
+widget or panel. Start and stop a screen share to verify that Noctalia's DND
+state follows the session according to the ownership settings below.
+
 ## How it works
 
 - A headless service follows `niri msg -j event-stream` and reacts to
@@ -36,9 +50,9 @@ enabled. When the last screencast stops, notifications come back.
 - **Always disable DND after sharing** — force DND off when sharing ends,
   regardless of its state before sharing started.
 
-## Requirements & limitations
+## Requirements
 
-- Requires **niri** (detection is niri IPC). Detection only starts inside a
+- Requires `niri` (detection is niri IPC). Detection only starts inside a
   niri session (`NIRI_SOCKET` set and the `niri` binary in `PATH`); on other
   compositors the service is inert and spawns no processes.
 - Disabling or reloading the plugin mid-share while it owns DND turns DND

@@ -35,6 +35,9 @@
 
 - [ ] The directory name matches the part of `id` after the `/` in `plugin.toml` exactly.
 - [ ] It ships `plugin.toml`, `README.md`, `thumbnail.webp`, and `translations/en.json`.
+- [ ] `README.md` follows the
+      [README template](https://github.com/noctalia-dev/community-plugins/blob/main/README_TEMPLATE.md), documents
+      every entry id and dependency, and includes exact panel IPC commands and launcher prefixes where applicable.
 - [ ] I created `thumbnail.webp` with the [thumbnail generator](https://assets.noctalia.dev/plugins/thumbnail-generator.html).
 - [ ] `version` follows semver and is bumped in this PR; `min_noctalia` is the version I tested against.
 - [ ] Every non-English translation in this PR uses a locale supported by Noctalia core, and I can read, write, and

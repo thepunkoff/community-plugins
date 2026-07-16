@@ -151,6 +151,7 @@ HTML_RE = re.compile(
 )
 INLINE_CODE_RE = re.compile(r"(?<!`)(`+)(?!`)(.*?)(?<!`)\1(?!`)", re.DOTALL)
 FENCE_OPEN_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
+ATX_HEADING_RE = re.compile(r"^ {0,3}(#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$")
 OBSOLETE_CONFIG_ACCESSOR_RE = re.compile(
     r"\b(barWidget|desktopWidget|panel|launcher)\s*\.\s*getConfig\b"
 )
@@ -209,6 +210,50 @@ def raw_html_line(markdown: str) -> int | None:
     if match is None:
         return None
     return text.count("\n", 0, match.start()) + 1
+
+
+def markdown_headings(markdown: str) -> list[tuple[int, str, int, int]]:
+    """Return ATX headings outside fenced code as (level, title, start, end)."""
+    headings: list[tuple[int, str, int, int]] = []
+    fence_char = ""
+    fence_length = 0
+    offset = 0
+
+    for line in markdown.splitlines(keepends=True):
+        stripped = line.rstrip("\r\n")
+        if fence_char:
+            closing = rf"^ {{0,3}}{re.escape(fence_char)}{{{fence_length},}}\s*$"
+            if re.match(closing, stripped):
+                fence_char = ""
+                fence_length = 0
+            offset += len(line)
+            continue
+
+        opening = FENCE_OPEN_RE.match(line)
+        if opening:
+            fence = opening.group(1)
+            fence_char = fence[0]
+            fence_length = len(fence)
+            offset += len(line)
+            continue
+
+        match = ATX_HEADING_RE.match(stripped)
+        if match:
+            headings.append((len(match.group(1)), match.group(2).strip(), offset, offset + len(line)))
+        offset += len(line)
+
+    return headings
+
+
+def section_body(markdown: str, headings: list[tuple[int, str, int, int]], index: int) -> str:
+    """Return a heading's body, including nested subsections."""
+    level, _title, _start, body_start = headings[index]
+    body_end = len(markdown)
+    for next_level, _next_title, next_start, _next_end in headings[index + 1 :]:
+        if next_level <= level:
+            body_end = next_start
+            break
+    return markdown[body_start:body_end].strip()
 
 
 def obsolete_config_accessors(source: str) -> list[tuple[str, int]]:
@@ -924,7 +969,7 @@ class Validator:
                 f"Export one with {THUMBNAIL_GENERATOR_URL}",
             )
 
-    def validate_readme(self, plugin_dir: Path) -> None:
+    def validate_readme(self, plugin_dir: Path, manifest: dict[str, Any]) -> None:
         readme = plugin_dir / "README.md"
         if not readme.is_file():
             return
@@ -938,6 +983,109 @@ class Validator:
         line = raw_html_line(contents)
         if line is not None:
             self.add_error(readme, f"raw HTML on line {line} is not allowed; use Markdown instead")
+
+        headings = markdown_headings(contents)
+        h1_indexes = [index for index, heading in enumerate(headings) if heading[0] == 1]
+        if not h1_indexes:
+            self.add_error(readme, "missing a level-one plugin title ('# Plugin Name')")
+        else:
+            h1_index = h1_indexes[0]
+            intro_start = headings[h1_index][3]
+            intro_end = headings[h1_index + 1][2] if h1_index + 1 < len(headings) else len(contents)
+            intro = contents[intro_start:intro_end]
+            intro_words = re.findall(r"[A-Za-z0-9][A-Za-z0-9'_-]*", intro)
+            if len(intro_words) < 8:
+                self.add_error(readme, "add a short introduction below the title explaining what the plugin does")
+
+        h2_by_name = {
+            title.casefold(): index
+            for index, (level, title, _start, _end) in enumerate(headings)
+            if level == 2
+        }
+        for section in ("Plugin", "Usage"):
+            index = h2_by_name.get(section.casefold())
+            if index is None:
+                self.add_error(readme, f"missing required '## {section}' section")
+            elif not section_body(contents, headings, index):
+                self.add_error(readme, f"'## {section}' section must not be empty")
+
+        plugin_section_index = h2_by_name.get("plugin")
+        plugin_section = (
+            section_body(contents, headings, plugin_section_index)
+            if plugin_section_index is not None
+            else ""
+        )
+
+        plugin_id = manifest.get("id")
+        if not is_non_empty_string(plugin_id):
+            return
+
+        documented_id = f"`{plugin_id}`"
+        if documented_id not in plugin_section:
+            self.add_error(readme, f"Plugin section must document the manifest id as {documented_id}")
+
+        for entry_type in ENTRY_TYPES:
+            entries = manifest.get(entry_type, [])
+            if not isinstance(entries, list):
+                continue
+            for entry in entries:
+                if not isinstance(entry, dict) or not is_non_empty_string(entry.get("id")):
+                    continue
+                entry_id = entry["id"]
+                documented_entry = f"`{entry_id}`"
+                if documented_entry not in plugin_section:
+                    self.add_error(
+                        readme,
+                        f"Plugin section must document {entry_type} entry '{entry_id}' as {documented_entry}",
+                    )
+
+                if entry_type == "panel":
+                    command = f"noctalia msg panel-toggle {plugin_id}:{entry_id}"
+                    if command not in contents:
+                        self.add_error(
+                            readme,
+                            f"missing panel IPC command; add: {command}",
+                        )
+
+                if entry_type == "launcher_provider" and is_non_empty_string(entry.get("prefix")):
+                    prefix = f"`/{entry['prefix']}`"
+                    if prefix not in plugin_section:
+                        self.add_error(
+                            readme,
+                            f"missing launcher prefix {prefix} for entry '{entry_id}'",
+                        )
+
+        dependencies = manifest.get("dependencies", [])
+        if isinstance(dependencies, list) and dependencies:
+            requirements_index = h2_by_name.get("requirements")
+            if requirements_index is None:
+                self.add_error(readme, "plugins with dependencies require a '## Requirements' section")
+                requirements = ""
+            else:
+                requirements = section_body(contents, headings, requirements_index)
+                if not requirements:
+                    self.add_error(readme, "'## Requirements' section must not be empty")
+            for dependency in dependencies:
+                if is_non_empty_string(dependency) and f"`{dependency}`" not in requirements:
+                    self.add_error(
+                        readme,
+                        f"Requirements must mention manifest dependency `{dependency}`",
+                    )
+
+        has_settings = bool(manifest.get("setting"))
+        for entry_type in SETTING_OWNER_TYPES:
+            entries = manifest.get(entry_type, [])
+            if isinstance(entries, list) and any(
+                isinstance(entry, dict) and bool(entry.get("setting")) for entry in entries
+            ):
+                has_settings = True
+                break
+        if has_settings:
+            settings_index = h2_by_name.get("settings")
+            if settings_index is None:
+                self.add_error(readme, "plugins with settings require a '## Settings' section")
+            elif not section_body(contents, headings, settings_index):
+                self.add_error(readme, "'## Settings' section must not be empty")
 
     def validate_luau_api(self, plugin_dir: Path) -> None:
         for source_path in sorted(plugin_dir.rglob("*.luau")):
@@ -969,7 +1117,7 @@ class Validator:
         self.validate_root_fields(manifest_path, manifest)
         self.validate_required_files(manifest_path, plugin_dir)
         self.validate_thumbnail(manifest_path, plugin_dir)
-        self.validate_readme(plugin_dir)
+        self.validate_readme(plugin_dir, manifest)
         self.validate_luau_api(plugin_dir)
         self.validate_no_symlinks(manifest_path, plugin_dir)
 

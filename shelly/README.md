@@ -7,13 +7,24 @@ Shelly is a plugin that uses the [Shelly Arch Package Manager](https://github.co
 | Field   | Value                                   |
 | ------- | --------------------------------------- |
 | ID      | `joshuaslate/shelly`                    |
-| Entries | Service: `poller`; bar widget: `shelly` |
+| Entries | Service: `update_poller`; bar widget: `shelly` |
 
 ## Requirements
 
-Install the Shelly Arch Package Manager from the [AUR](https://aur.archlinux.org/packages/shelly).
+Install the Shelly Arch Package Manager from the [AUR](https://aur.archlinux.org/packages/shelly). The `shelly`
+command must be available on `PATH`.
 
 Test that it works by running `shelly check-updates` in a terminal. If it returns a list of packages, then it is working correctly.
+
+## Usage
+
+Add the `shelly` widget from Noctalia's widget picker. It periodically checks
+for available Arch package updates and shows their count and names in the bar
+tooltip. Click behavior is configurable: open Shelly's graphical interface,
+run `shelly upgrade-all` in a terminal, or do nothing.
+
+The `update_poller` service owns the periodic checks and can notify you when
+new updates become available.
 
 ## Settings
 
