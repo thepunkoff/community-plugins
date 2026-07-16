@@ -234,7 +234,7 @@ function onCancelClicked()
 end
 
 function onUpdateClicked()
-    command = cfg("update_command")
+    local command = cfg("update_command")
     if command == "" then
         noctalia.notifyError(tr("notification.update_command_is_empty"))
         return
@@ -249,7 +249,7 @@ function onUpdateClicked()
 end
 
 function onCleanClicked()
-    command = cfg("clean_command")
+    local command = cfg("clean_command")
     if command == "" then
         noctalia.notifyError(tr("notification.clean_command_is_empty"))
         return

@@ -11,16 +11,14 @@ function getState(key)
 end
 
 function displayWidget(glyph: string, text: string, color: string?)
-    if color == nil then
-        color = "on_surface"
-    end
+    local _color = color or "on_surface"
 
     if cfg("colorize_text") then
-        barWidget.setColor(color)
+        barWidget.setColor(_color)
     end
 
     if cfg("colorize_glyph") then
-        barWidget.setGlyphColor(color)
+        barWidget.setGlyphColor(_color)
     end
 
     if cfg("show_glyph") then
