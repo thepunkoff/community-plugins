@@ -12,7 +12,7 @@ highlighting, animated line changes, and configurable online or local sources.
 
 ## Requirements
 
-Install `playerctl`, `python3`, `curl`, and `cp` on `PATH`. The active media
+Install `playerctl`, `python3`, and `cp` on `PATH`. The active media
 player must expose MPRIS metadata for automatic track and playback detection.
 
 Noctalia installs the plugin files; it does not install system packages for you.
@@ -103,7 +103,7 @@ HTTP mode contacts only the configured endpoint. The plugin never reads browser
 cookies or player credentials.
 
 The service runs `playerctl` to read and control MPRIS playback, `python3` for the
-LRCLIB helper and dynamic-lyric parser, `curl` for the public NetEase API, and
-`cp` to preserve temporary local cover files. Query scratch files and downloaded
-cover images are written inside the plugin runtime directory. Remote code is
-never downloaded or executed.
+LRCLIB helper and dynamic-lyric parser, and `cp` to preserve temporary local cover
+files. Public NetEase requests use Noctalia's HTTP API. Query scratch files and
+downloaded cover images are written inside the plugin runtime directory. Remote
+code is never downloaded or executed.
