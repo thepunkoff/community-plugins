@@ -184,3 +184,14 @@ icon = "microphone"
 description = "Noctalia companion for hyprwhspr: shows dictation state, click to record, right-click to restart."
 plugin_api = 3
 tags = ["audio", "bar", "recording", "utility"]
+
+[[plugin]]
+id = "nightwatch75/file-search"
+name = "File Search"
+version = "0.0.9"
+author = "nightwatch75"
+license = "MIT"
+icon = "search"
+description = "Search files and folders as you type, fuzzy-matched with fzf; open results with the system MIME association."
+plugin_api = 3
+tags = ["bar", "launcher", "panel", "utility", "productivity"]
