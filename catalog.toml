@@ -239,3 +239,15 @@ icon = "smart-home"
 description = "Monitor and control Home Assistant entities from the bar. Displays entity states and provides quick toggles."
 plugin_api = 4
 tags = ["bar", "panel", "service", "shortcut", "network", "indicator"]
+
+[[plugin]]
+id = "yocraft/web-launcher"
+name = "Web Launcher"
+version = "1.0.0"
+author = "yocraft"
+license = "MIT"
+icon = "world"
+description = "Quickly open your favorite websites from the launcher."
+deprecated = false
+plugin_api = 3
+tags = ["launcher", "utility", "network", "productivity"]
