@@ -13,12 +13,12 @@
     "pid_copied": "Copied PID {pid}"
   },
   "categories": {
-    "Development": "Development",
-    "Databases": "Databases",
-    "Containers": "Containers",
-    "Servers": "Servers",
-    "Cloud": "Cloud",
-    "Other": "Other"
+    "development": "Development",
+    "databases": "Databases",
+    "containers": "Containers",
+    "servers": "Servers",
+    "cloud": "Cloud",
+    "other": "Other"
   },
   "service": {
     "terminated": "Process {pid} terminated",

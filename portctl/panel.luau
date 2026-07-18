@@ -277,7 +277,7 @@ local function catSection(catName, ports)
     fill     = "surface_container/0.4",
   }, {
     ui.glyph({ name = meta.icon, size = 12, color = meta.color }),
-    ui.label({ text = noctalia.tr("categories." .. catName), fontSize = 11, fontWeight = "bold", color = meta.color }),
+    ui.label({ text = noctalia.tr("categories." .. catName:lower()), fontSize = 11, fontWeight = "bold", color = meta.color }),
     ui.label({ text = tostring(#ports), fontSize = 10, color = meta.color .. "/0.6" }),
   }))
 
