@@ -3,11 +3,12 @@ name = "Web Launcher"
 version = "1.0.0"
 plugin_api = 3
 author = "yocraft"
+license = "MIT"
+deprecated = false
+icon = "world"
 description = "Quickly open your favorite websites from the launcher."
 tags = ["launcher", "utility", "network", "productivity"]
 dependencies = [ "xdg-utils" ]
-licence = "MIT"
-icon = "world"
 
 [[launcher_provider]]
 id = "web-launcher"
