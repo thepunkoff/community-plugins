@@ -8,11 +8,14 @@ local function loadLinks()
 
     for _, line in ipairs(raw) do
         local name, url = line:match("^([^|]+)|(.+)$")
-        if name and url and url:match("^https?://") then
-            table.insert(links, {
-                name = noctalia.string.trim(name),
-                url = noctalia.string.trim(url),
-            })
+        if name and url then
+            name = noctalia.string.trim(name)
+            url = noctalia.string.trim(url)
+            if url:match("^https?://") then
+                table.insert(links, { name = name, url = url })
+            else
+                noctalia.log("web-launcher: skipped non-http(s) URL: " .. tostring(line))
+            end
         else
             noctalia.log("web-launcher: skipped malformed line (expected Name|https://url): " .. tostring(line))
         end
