@@ -199,7 +199,7 @@ tags = ["bar", "launcher", "panel", "utility", "productivity"]
 [[plugin]]
 id = "h465855hgg/lyrics"
 name = "Lyrics"
-version = "1.4.0"
+version = "1.4.1"
 author = "h465855hgg"
 license = "MIT"
 icon = "music"
