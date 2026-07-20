@@ -1,0 +1,45 @@
+{
+    "work": "Work",
+    "shortBreak": "Short Break",
+    "longBreak": "Long Break",
+    "session": "Session",
+    "button": {
+        "start": "Start",
+        "resume": "Resume",
+        "pause": "Pause",
+        "skip": "Skip",
+        "reset": "Reset",
+        "resetAll": "Reset All"
+    },
+    "notification": {
+        "workComplete": "Work session complete! Time for a break.",
+        "shortBreakComplete": "Break over! Ready to focus?",
+        "longBreakComplete": "Long break over! Ready for a new cycle?"
+    },
+    "settings": {
+        "workDuration":{
+            "label": "Work Duration",
+            "description": "Duration of each work session in minutes"
+        },
+        "shortBreakDuration":{
+            "label": "Short Break Duration",
+            "description": "Duration of short breaks in minutes"
+        },
+        "longBreakDuration":{
+            "label": "Long Break Duration",
+            "description": "Duration of long breaks in minutes"
+        },
+        "sessionsBeforeLongBreak":{
+            "label": "Sessions Before Long Break",
+            "description": "Number of sessions before a long break"
+        },
+        "autoStartWork":{
+            "label": "Auto-start Work",
+            "description": "Automatically start work timer after break"
+        },
+        "autoStartBreaks":{
+            "label": "Auto-start Breaks",
+            "description": "Automatically start break timer after work session"
+        }
+    }
+}
