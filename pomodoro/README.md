@@ -11,6 +11,7 @@ A Pomodoro timer plugin for Noctalia for productivity. Initially ported from the
 
 ## TODO 
 - Sound notification (currently the toast is shown silently)
+- IPC
 
 ## Plugin
 
@@ -18,6 +19,16 @@ A Pomodoro timer plugin for Noctalia for productivity. Initially ported from the
 | --- | --- |
 | ID | `thepunkoff/pomodoro` |
 | Entries | Bar widget: `widget`; panel: `panel`; service: `pomodoro` |
+
+## Usage
+1. Enable plugin in settings
+2. Add bar widget `Pomodoro Timer`
+3. Widget appears on the bar, clicking it will toggle the panel.
+
+To open the panel with a command:
+```sh
+noctalia msg panel-toggle thepunkoff/pomodoro:panel
+```
 
 ## Settings
 
@@ -29,3 +40,8 @@ A Pomodoro timer plugin for Noctalia for productivity. Initially ported from the
 | `sessionsBeforeLongBreak` | `int` | `4` | Number of sessions before a long break. |
 | `autoStartWork` | `bool` | `false` | Automatically start the work timer after a break. |
 | `autoStartBreaks` | `bool` | `false` | Automatically start the break timer after a work session. |
+
+## IPC
+```sh
+noctalia msg panel-toggle thepunkoff/pomodoro:panel
+```
