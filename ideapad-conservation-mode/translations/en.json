@@ -6,14 +6,14 @@
     "write_failed_manual": "Failed to write conservation_mode ({error}). Run scripts/setup-permissions.sh with sudo manually, then log out and back in."
   },
   "notify": {
-    "disabled": "Disabled - charging to 100%.",
-    "enabled": "Enabled - charging capped for battery health.",
-    "setup_needed": "One-time setup needed - check the terminal window that just opened."
+    "disabled": "Disabled – charging to 100%",
+    "enabled": "Enabled – charging capped for battery health",
+    "setup_needed": "One-time setup is needed. Check the terminal window that just opened."
   },
   "shortcut": {
     "na": "Conservation N/A",
-    "off": "Conservation Off",
-    "on": "Conservation On"
+    "off": "Conservation",
+    "on": "Conservation"
   },
-  "title": "Conservation Mode"
+  "title": "Conservation mode"
 }
