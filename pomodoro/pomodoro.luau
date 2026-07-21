@@ -1,11 +1,11 @@
 local config = (function()
     return {
-        workDuration = noctalia.getConfig("workDuration"),
-        shortBreakDuration = noctalia.getConfig("shortBreakDuration"),
-        longBreakDuration = noctalia.getConfig("longBreakDuration"),
-        sessionsBeforeLongBreak = noctalia.getConfig("sessionsBeforeLongBreak"),
-        autoStartBreaks = noctalia.getConfig("autoStartBreaks"),
-        autoStartWork = noctalia.getConfig("autoStartWork"),
+        workDuration = noctalia.getConfig("work-duration"),
+        shortBreakDuration = noctalia.getConfig("short-break-duration"),
+        longBreakDuration = noctalia.getConfig("long-break-duration"),
+        sessionsBeforeLongBreak = noctalia.getConfig("sessions-before-long-break"),
+        autoStartBreaks = noctalia.getConfig("auto-start-breaks"),
+        autoStartWork = noctalia.getConfig("auto-start-work"),
     }
 end)()
 noctalia.state.set("pomodoro.config", config)
@@ -69,7 +69,6 @@ noctalia.state.watch("pomodoro.nextCommand", function(command)
     local state = getStateSnapshot()
     noctalia.state.set("pomodoro.state", state)
 end)
-
 
 local state = getStateSnapshot()
 noctalia.state.set("pomodoro.state", state)
