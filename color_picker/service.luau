@@ -208,7 +208,7 @@ local function runPicker(onResult: (string?, string?) -> ())
       copyText = hex:lower()
     end
 
-    noctalia.copyToClipboard(copyText, "text/plain")
+    noctalia.copyToClipboard(copyText, "text/plain;charset=utf-8")
     onResult(hex, copyText)
   end)
 end

@@ -348,7 +348,7 @@ local function processCopy(format: (string, number) -> string)
   if current == nil then return end
 
   local text = format(current, getSelectedOpacity())
-  noctalia.copyToClipboard(text, "text/plain")
+  noctalia.copyToClipboard(text, "text/plain;charset=utf-8")
   noctalia.notify(tr_color_picker, tr("color_copied", { color = text }))
 end
 

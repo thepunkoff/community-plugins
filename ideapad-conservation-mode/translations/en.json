@@ -11,9 +11,8 @@
     "setup_needed": "One-time setup is needed. Check the terminal window that just opened."
   },
   "shortcut": {
-    "na": "Conservation N/A",
-    "off": "Conservation",
-    "on": "Conservation"
+    "label": "Conservation",
+    "na": "Conservation N/A"
   },
   "title": "Conservation mode"
 }
