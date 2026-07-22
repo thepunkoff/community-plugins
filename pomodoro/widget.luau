@@ -38,6 +38,6 @@ noctalia.state.watch("pomodoro.state", function(state)
     local mins = math.floor((state.secondsLeft % 3600) / 60)
     local secs = state.secondsLeft % 60
 
-    local time = if secs < 3600 then string.format("%02d:%02d", mins, secs) else string.format("%d:%02d:%02d", hours, mins, secs)
+    local time = if hours == 0 then string.format("%02d:%02d", mins, secs) else string.format("%d:%02d:%02d", hours, mins, secs)
     barWidget.setText(time)
 end)

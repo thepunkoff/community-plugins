@@ -34,14 +34,21 @@ noctalia msg panel-toggle thepunkoff/pomodoro:panel
 
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
-| `workDuration` | `int` | `25` | Duration of each work session in minutes. |
-| `shortBreakDuration` | `int` | `5` | Duration of short breaks in minutes. |
-| `longBreakDuration` | `int` | `15` | Duration of long breaks in minutes. |
-| `sessionsBeforeLongBreak` | `int` | `4` | Number of sessions before a long break. |
-| `autoStartWork` | `bool` | `false` | Automatically start the work timer after a break. |
-| `autoStartBreaks` | `bool` | `false` | Automatically start the break timer after a work session. |
+| `work-duration` | `int` | `25` | Duration of each work session in minutes. |
+| `short-break-duration` | `int` | `5` | Duration of short breaks in minutes. |
+| `long-break-duration` | `int` | `15` | Duration of long breaks in minutes. |
+| `sessions-before-long-break` | `int` | `4` | Number of sessions before a long break (min=1). |
+| `auto-dtart-eork` | `bool` | `false` | Automatically start the work timer after a break. |
+| `auto-start-breaks` | `bool` | `false` | Automatically start the break timer after a work session. |
 
 ## IPC
 ```sh
 noctalia msg panel-toggle thepunkoff/pomodoro:panel
+```
+
+## Licensing
+
+This project is licensed under the MIT License.
+
+It bundles the JetBrains Mono font, which is licensed separately under the SIL Open Font License 1.1 (OFL-1.1). See `THIRD_PARTY_LICENSES/OFL.txt` for the full license text.
 ```

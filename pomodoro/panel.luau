@@ -112,7 +112,7 @@ local function render(state, sessionData)
                     }),
 
                     ui.button({
-                        text = noctalia.tr("buttin.skip"),
+                        text = noctalia.tr("button.skip"),
                         glyph = "player-skip-forward",
                         onClick = "onSkipButtonClick",
                         enabled = skipButtonEnabled,

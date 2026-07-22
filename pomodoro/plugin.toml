@@ -36,6 +36,7 @@ type    = "int"
 label_key = "settings.sessions-before-long-break.label"
 description_key = "settings.sessions-before-long-break.description"
 default = 4
+min = 1
 
 [[setting]]
 key     = "auto-start-breaks"
